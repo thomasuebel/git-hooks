@@ -1,0 +1,10 @@
+#!/bin/sh
+# For when you ought to attach the jira issue to every commit message
+#
+#
+
+issue=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///')
+if [ -n "$issue" ]; then
+  echo "$issue: " | cat - $1 > /tmp/out && mv /tmp/out $1
+fi
+
