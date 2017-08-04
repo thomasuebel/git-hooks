@@ -1,10 +1,74 @@
-#!/bin/sh
+#!/bin/bash
+
 # For when you ought to attach the jira issue to every commit message
 #
-#
+# Assuming your branch name matches the JIRA issue, this is a 
+# very naive way of parsing your branch name, and prepending it
+# to your git commit message when using 
+#    git commit -m 
 
-issue=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///')
-if [ -n "$issue" ]; then
-  echo "$issue: " | cat - $1 > /tmp/out && mv /tmp/out $1
+GIT_COMMIT_MSG_FILE=$1
+
+getCurrentGitBranch() {
+	# get the current branch and 
+	# remove "refs/heads/" from the resulting string
+	#
+	local branchName=$(git symbolic-ref HEAD | sed -e 's/refs\/heads\///')
+	echo "$branchName"
+} 
+
+isBranchNameAppliedToCommitMsg() {
+	# check if the given branchname has been applied to
+	# the git commit message file
+	#	
+	# param branchName - the branch
+	# param commitMsgFile - the file to test
+	#
+	if grep -q $1 $2; then
+		echo "true"
+	else
+		echo "false"
+	fi
+}
+
+isBranchNameMaster() {
+	# check if the given branchName matches "master"
+	#
+	# param branchName - the branch
+	#
+	if [ "$1" == "master" ]; then
+		echo "true"
+	else
+		echo "false"
+	fi
+
+}
+prependBranchNameToFileContent() {
+	# prepend the branch name to the
+	# given file
+	#
+	# param branchName - the branch
+	# param commitMsgFile - the file to prepend to
+	#
+	echo "$1: " | cat - "$2" > /tmp/out && mv /tmp/out "$2"
+}
+
+if [[ $# < 1 ]]; then
+	echo "No git commit message file present."
+	exit -1
 fi
 
+issue=$(getCurrentGitBranch)
+
+# don't do anything if we're on master branch
+if [ $(isBranchNameMaster "$issue") == "true" ]; then
+else
+
+	# if the branchName is already present don't do anything.
+	if [ $(isBranchNameAppliedToCommitMsg "$issue" "$GIT_COMMIT_MSG_FILE") == "true" ]; then
+	else
+
+		
+		prependBranchNameToFileContent "$issue" "$GIT_COMMIT_MSG_FILE"
+	fi
+fi
