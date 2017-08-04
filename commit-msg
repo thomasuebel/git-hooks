@@ -61,14 +61,9 @@ fi
 issue=$(getCurrentGitBranch)
 
 # don't do anything if we're on master branch
-if [ $(isBranchNameMaster "$issue") == "true" ]; then
-else
-
-	# if the branchName is already present don't do anything.
-	if [ $(isBranchNameAppliedToCommitMsg "$issue" "$GIT_COMMIT_MSG_FILE") == "true" ]; then
-	else
-
-		
+if [ $(isBranchNameMaster "$issue") != "true" ]; then
+	# apply the branchName if it isn't already present.
+	if [ $(isBranchNameAppliedToCommitMsg "$issue" "$GIT_COMMIT_MSG_FILE") != "true" ]; then
 		prependBranchNameToFileContent "$issue" "$GIT_COMMIT_MSG_FILE"
 	fi
 fi
