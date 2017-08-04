@@ -55,9 +55,12 @@ prependBranchNameToFileContent() {
 }
 
 getRepositoryCommitUrl() {
+	# get the commit url to the last commit
+	#
 	local commitHash=$(git log HEAD -1 --pretty="%H")
-
+	echo "$REPOSITORY_COMMIT_URL$commitHash"
 }
+
 if [[ $# < 1 ]]; then
 	echo "No git commit message file present."
 	exit -1
@@ -70,5 +73,6 @@ if [ $(isBranchNameMaster "$issue") != "true" ]; then
 	# apply the branchName if it isn't already present.
 	if [ $(isBranchNameAppliedToCommitMsg "$issue" "$GIT_COMMIT_MSG_FILE") != "true" ]; then
 		prependBranchNameToFileContent "$issue" "$GIT_COMMIT_MSG_FILE"
+		getRepositoryCommitUrl
 	fi
 fi
