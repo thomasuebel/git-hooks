@@ -8,6 +8,7 @@
 #    git commit -m 
 
 GIT_COMMIT_MSG_FILE=$1
+REPOSITORY_COMMIT_URL="https://git.navision.misterspex.yy/intershop/intershop/commit/"
 
 getCurrentGitBranch() {
 	# get the current branch and 
@@ -50,9 +51,13 @@ prependBranchNameToFileContent() {
 	# param branchName - the branch
 	# param commitMsgFile - the file to prepend to
 	#
-	echo "$1: " | cat - "$2" > /tmp/out && mv /tmp/out "$2"
+	echo -n "$1: " | cat - "$2" > /tmp/out && mv /tmp/out "$2"
 }
 
+getRepositoryCommitUrl() {
+	local commitHash=$(git log HEAD -1 --pretty="%H")
+
+}
 if [[ $# < 1 ]]; then
 	echo "No git commit message file present."
 	exit -1
