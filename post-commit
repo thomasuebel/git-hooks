@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Print the repository url of the last commit
+#
+# This will print out the configured url of the git repository and apped
+# the git commit hash of the last commit. # Useful to copy/paste the url 
+# to jira/confluence what-have-you
+
+REPOSITORY_COMMIT_URL="https://git.navision.misterspex.yy/intershop/intershop/commit/"
+
+getRepositoryCommitUrl() {
+	# get the commit url to the last commit
+	#
+	local commitHash=$(git log HEAD -1 --pretty="%H")
+	echo "$REPOSITORY_COMMIT_URL$commitHash"
+}
+
+getRepositoryCommitUrl
