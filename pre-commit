@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# GIT PRE COMMIT HOOK
+#
+
+is_staged () {
+	# Ensure a file is staged
+	#
+	# Paramter:
+	# $1 - String, file name to be grepped for
+	#
+	# Returns: 
+	# String true|false
+	git diff --cached --name-status | grep -qE "$1"
+	is_staged="$?"
+	if [ "$is_staged" = "0" ]; then
+		echo "true"
+	else
+		echo "false"
+	fi
+}
+
+staged_together () {
+	# Ensure that two files are staged at once
+	#
+	# Parameter:
+	# $1 - String, file that should be staged
+	# $2 - String, file that should be staged
+	#
+	# Returns: 
+	# String true - when both/neither of the files are staged for commit
+	# String false - when only one of the given files is staged for commit
+	if [ "$(is_staged "$1")" = "true" ] && [ "$(is_staged "$2")" = "true" ]; then
+		# Both are staged - all good
+		echo "true"
+		return 0
+	fi
+	if [ "$(is_staged "$1")" = "false" ] && [ "$(is_staged "$2")" = "false" ]; then
+		# Neither is staged - all good
+		echo "true"
+		return 0
+	fi
+	
+	echo "false"
+}
+
+#
+if [ "$(staged_together "yarn.lock" "package.json")" = "false" ]; then
+	echo "Either 'yarn.lock' or 'package.json' have been staged for commit without each other. Both files need to be staged for one singular commit."
+	echo "You can add the missing file with 'git add' or remove the file from the stage using 'git reset HEAD'!"
+	echo "Commit canceled."
+	exit -1
+fi
+
+# All is good, allow the
+exit 0
